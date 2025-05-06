@@ -102,6 +102,75 @@ DUPE_ROOT = Path(PATH_MAP["/music/dupes"])
    ```bash
    sudo apt install chromaprint mediainfo
    ```
-   
-   
 
+## ▶️ Usage
+
+- **Dry-run** for a single artist (no changes applied)  
+  ```bash
+  ./plex_music_deduper.py --artist "Artist Name" --dry-run
+  ```
+- **Full run** on all artists
+  ```bash
+  ./plex_music_deduper.py
+  ```
+- **Debug mode** (ultra-verbose)
+  ```bash
+  ./plex_music_deduper.py --debug
+  ```
+- **Rollback** last run’s file moves
+  ```bash
+  ./plex_music_deduper.py --rollback
+  ```
+
+## 🔍 How It Works
+
+1. **Discover editions**  
+   - Queries Plex SQLite DB for each album’s `ratingKey`  
+   - Joins `metadata_items` → `media_items` → `media_parts`  
+   - Collects all file‐paths (`mp.file`) and maps them to real host directories via `PATH_MAP`
+
+2. **Normalize & group**  
+   - Strips format suffixes from album titles (`normalize_title`)  
+   - Groups all Plex “editions” sharing the same normalized title
+
+3. **Collect file lists**  
+   - Recursively scans each edition directory for audio files (`*.flac, .mp3, .wav…`)  
+   - Builds a combined list of files to fingerprint
+
+4. **Fingerprint & score**  
+   - Runs `fpcalc` (Chromaprint) on each track (first 30 s) and caches results  
+   - Extracts format, bit-depth, sample rate, duration via MediaInfo  
+   - Scores each edition:  
+     1. Format weight (FLAC/APE/ALAC = 3 → WAV/M4A = 2 → MP3/OGG = 1)  
+     2. Bit depth  
+     3. Sample rate  
+     4. Total unique fingerprints  
+
+5. **Choose super-master**  
+   - Picks edition with highest **average format score** and most **unique fingerprints**  
+
+6. **Merge missing tracks**  
+   - Copies any fingerprint-unique tracks from losing editions into the super-master folder  
+   - Avoids overwriting (appends `_alt1`, `_alt2`, … if needed)  
+
+7. **Move losing editions**  
+   - Relocates all non-master edition folders to `DUPE_ROOT` (e.g. `…/Music_dupes/Plex_dupes`)  
+   - Records each move (`src|dst`) in `ROLLBACK_LOG`  
+
+8. **Plex sync**  
+   - Sends Plex API requests to:  
+     1. Refresh artist metadata  
+     2. Trigger a **folder scan** on the specific `/music/matched/.../Artist/Album` path  
+     3. Empty the library section’s trash  
+
+9. **Summary & rollback**  
+   - Prints per-album stats (`Init` tracks, `Add` merged, `Moved` editions, `Gain` MB freed)  
+   - **Rollback** mode reads `ROLLBACK_LOG` and moves directories back to original locations
+   
+## ⚠️ Disclaimer
+
+- **Use at your own risk.** This tool reflects *my* personal workflow: prioritizing a single high-quality “super-master” and relocating losing editions.  
+- **Dry-run first!** Always test with `--dry-run` on a small artist or album to verify behavior before touching your entire library.  
+- **Backup recommended:** Even with rollback support, create a backup of your music files and database before running.  
+- **Not one-size-fits-all:** Review and adjust scoring criteria, folder mappings, and merge logic to suit your own requirements.  
+- **No warranties:** This script is provided “as is.” I’m not responsible for any data loss, misplacement, or other issues that may occur.  
