@@ -4,20 +4,6 @@
 
 ---
 
-## 🔍 Table of Contents
-
-1. [Overview](#overview)  
-2. [Features](#features)  
-3. [Prerequisites](#prerequisites)  
-4. [Configuration](#configuration)  
-5. [Installation](#installation)  
-6. [Usage](#usage)  
-7. [How It Works](#how-it-works)  
-8. [Rollback & Safety](#rollback--safety)  
-9. [Disclaimer](#disclaimer)  
-
----
-
 ## 📖 Overview
 
 When your Plex music library grows, it’s easy to end up with multiple editions of the same album scattered across your filesystem. **Plex Music Deduper** automates:
