@@ -15,7 +15,6 @@
 7. [How It Works](#how-it-works)  
 8. [Rollback & Safety](#rollback--safety)  
 9. [Disclaimer](#disclaimer)  
-10. [License](#license)  
 
 ---
 
