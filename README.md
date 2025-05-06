@@ -71,15 +71,12 @@ PLEX_TOKEN = "YOUR_PLEX_TOKEN"
 SECTION_ID = 1
 
 # Map Plex container prefixes → real host paths
-# If Plex runs in Docker, map each container path to where it lives on the host:
+# **If Plex runs in Docker**, map each container path to where it lives on the host:
 PATH_MAP = {
-    "/music/compilations": "/mnt/music/Compilations",
-    "/music/matched":      "/mnt/music/Music_matched",
-    "/music/unmatched":    "/mnt/music/Music_dump",
-    "/music/dupes":        "/mnt/music/Music_dupes/Plex_dupes",
-    "/music/other":        "/mnt/music/OtherSource",
+    "/music/lib/location/in/container": "/music/lib/location/on/host/",
 }
-# If Plex runs on the same host, you can use identity mapping:
+
+# **If Plex runs on the same host**, you can use identity mapping:
 # PATH_MAP = {"/": "/"}
 
 # Where to drop losing editions
